@@ -12,12 +12,22 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase only once
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// Initialize Firebase only if config is present (prevents Vercel build crashes)
+let app, auth: any, db: any, storage: any, googleProvider: any;
 
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-const googleProvider = new GoogleAuthProvider();
+if (typeof window !== 'undefined' && firebaseConfig.apiKey) {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  db = getFirestore(app);
+  storage = getStorage(app);
+  googleProvider = new GoogleAuthProvider();
+} else {
+  // Dummy fallbacks for server-side static rendering
+  app = null;
+  auth = {} as any;
+  db = {} as any;
+  storage = {} as any;
+  googleProvider = {} as any;
+}
 
 export { app, auth, db, storage, googleProvider };

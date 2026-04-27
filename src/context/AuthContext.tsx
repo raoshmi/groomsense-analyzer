@@ -32,6 +32,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth?.currentUser && Object.keys(auth).length === 0) {
+      setLoading(false);
+      return; // Firebase not initialized
+    }
+
     // Setting persistence to LOCAL so the user stays logged in across sessions
     setPersistence(auth, browserLocalPersistence)
       .then(() => {

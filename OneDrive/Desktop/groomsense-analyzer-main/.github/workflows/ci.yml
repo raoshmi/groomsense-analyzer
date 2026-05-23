@@ -1,0 +1,39 @@
+name: GroomSense CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Run Jest Unit Tests
+      run: npm test
+
+    - name: Run Next.js Build
+      run: npm run build
+      env:
+        # Inject mock env keys to pass the environmental validation during production compilation checks
+        NEXT_PUBLIC_FIREBASE_API_KEY: "mock_api_key_12345"
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "mock-groomsense.firebaseapp.com"
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: "mock-groomsense"
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "mock-groomsense.appspot.com"
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "123456789012"
+        NEXT_PUBLIC_FIREBASE_APP_ID: "1:123456789012:web:1234567890abcdef"
+        GEMINI_API_KEY: "mock_gemini_api_key_value"
